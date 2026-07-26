@@ -11,8 +11,6 @@ interface DeadlineTrackerProps {
 }
 
 export default function DeadlineTracker({ programs, applicationStatuses, onStatusChange }: DeadlineTrackerProps) {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
   const [pinnedPrograms, setPinnedPrograms] = useState<string[]>([]);
   const [completedPlanSteps, setCompletedPlanSteps] = useState<Record<string, number>>(() => {
     if (typeof window === 'undefined') return {};
@@ -34,13 +32,6 @@ export default function DeadlineTracker({ programs, applicationStatuses, onStatu
 
   const filteredPrograms = programs.filter(program => pinnedPrograms.includes(program.id));
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-    }
-  };
-
   const completedStepsFor = (programId: string) => {
     const status = applicationStatuses[programId] || 'not_applied';
     const statusProgress = status === 'received' || status === 'approved' ? 3 : status === 'applied' ? 2 : 0;
@@ -59,6 +50,31 @@ export default function DeadlineTracker({ programs, applicationStatuses, onStatu
     }
     if (nextStep === 3) {
       onStatusChange(programId, 'approved');
+    }
+  };
+
+  const retreatPlan = (programId: string) => {
+    // "Record funds received" isn't tracked in completedPlanSteps (it's
+    // capped at 3), so undoing it just steps the status back down.
+    if (applicationStatuses[programId] === 'received') {
+      onStatusChange(programId, 'approved');
+      return;
+    }
+
+    const current = completedStepsFor(programId);
+    if (current === 0) return;
+
+    const prevStep = current - 1;
+    const updated = { ...completedPlanSteps, [programId]: prevStep };
+    setCompletedPlanSteps(updated);
+    localStorage.setItem('deadlinePlanSteps', JSON.stringify(updated));
+
+    // Undo the status flip that reaching `current` originally caused, so
+    // the max() in completedStepsFor doesn't immediately clamp back up.
+    if (current === 2) {
+      onStatusChange(programId, 'not_applied');
+    } else if (current === 3) {
+      onStatusChange(programId, 'applied');
     }
   };
 
@@ -156,27 +172,39 @@ export default function DeadlineTracker({ programs, applicationStatuses, onStatu
                     })}
                   </ol>
 
-                  {completedSteps < steps.length ? (
-                    <button
-                      type="button"
-                      onClick={() => advancePlan(program.id)}
-                      className="mt-5 rounded-lg bg-[#3d2b20] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2b1e15]"
-                    >
-                      {actionLabels[completedSteps]}
-                    </button>
-                  ) : applicationStatuses[program.id] === 'approved' ? (
-                    <button
-                      type="button"
-                      onClick={() => onStatusChange(program.id, 'received')}
-                      className="mt-5 rounded-lg border border-[#895031] px-3.5 py-2 text-sm font-semibold text-[#895031] transition-colors hover:bg-[#f8e8dc]"
-                    >
-                      Record funds received
-                    </button>
-                  ) : (
-                    <p className="mt-5 flex items-center gap-1.5 text-sm font-medium text-[#168260]">
-                      <CompleteIcon /> Plan complete
-                    </p>
-                  )}
+                  <div className="mt-5 flex flex-wrap items-center gap-4">
+                    {completedSteps < steps.length ? (
+                      <button
+                        type="button"
+                        onClick={() => advancePlan(program.id)}
+                        className="rounded-lg bg-[#3d2b20] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2b1e15]"
+                      >
+                        {actionLabels[completedSteps]}
+                      </button>
+                    ) : applicationStatuses[program.id] === 'approved' ? (
+                      <button
+                        type="button"
+                        onClick={() => onStatusChange(program.id, 'received')}
+                        className="rounded-lg border border-[#895031] px-3.5 py-2 text-sm font-semibold text-[#895031] transition-colors hover:bg-[#f8e8dc]"
+                      >
+                        Record funds received
+                      </button>
+                    ) : (
+                      <p className="flex items-center gap-1.5 text-sm font-medium text-[#168260]">
+                        <CompleteIcon /> Plan complete
+                      </p>
+                    )}
+
+                    {(completedSteps > 0 || applicationStatuses[program.id] === 'received') && (
+                      <button
+                        type="button"
+                        onClick={() => retreatPlan(program.id)}
+                        className="text-sm font-medium text-[#895031] hover:text-[#6b5a4e]"
+                      >
+                        Undo, I clicked the wrong step
+                      </button>
+                    )}
+                  </div>
                 </figure>
               );
             })}
@@ -188,40 +216,6 @@ export default function DeadlineTracker({ programs, applicationStatuses, onStatu
           <p className="mt-2 text-[#6b5a4e]">Pin programs from My Aid Programs to create a focused deadline tracker.</p>
         </section>
       )}
-
-      {/* Email Subscription */}
-      <div className="bg-[#faf6f1] rounded-[14px] p-6 border border-[#e4d9cf]">
-        <h3 className="font-serif text-[1.15rem] font-medium text-[#1f1610] mb-2">
-          Get Deadline Reminders
-        </h3>
-        <p className="text-[#6b5a4e] text-[1.05rem] mb-4">
-          We&apos;ll send you email reminders as your deadlines approach so you never miss an opportunity.
-        </p>
-
-        {!subscribed ? (
-          <form onSubmit={handleSubscribe} className="flex gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="flex-1 px-4 py-3 border border-[#e4d9cf] rounded-[14px] focus:ring-2 focus:ring-[#b0673f] focus:border-[#b0673f] text-[#1f1610] bg-white text-[1.05rem] transition-shadow"
-            />
-            <button
-              type="submit"
-              className="bg-[#b0673f] text-white px-6 py-3 rounded-[10px] font-semibold text-[1.05rem] hover:bg-[#895031] transition-colors"
-            >
-              Subscribe
-            </button>
-          </form>
-        ) : (
-          <div className="flex items-center gap-1.5 text-[#10b981] font-medium text-[1.05rem]">
-            <CompleteIcon />
-            Subscribed! We&apos;ll send reminders to {email}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

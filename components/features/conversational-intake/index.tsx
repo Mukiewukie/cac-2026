@@ -60,6 +60,7 @@ const REQUIRED_FIELDS = [
 ] as const;
 
 const ERROR_THRESHOLD = 3;
+const CHAT_HISTORY_STORAGE_KEY = 'wrenChatMessages';
 
 function validateSituation(raw: Record<string, unknown>): Partial<UserSituation> {
   const out: Partial<UserSituation> = {};
@@ -101,8 +102,22 @@ ${transcript}`;
   return validateSituation(parsed);
 }
 
+function loadStoredMessages(): Message[] {
+  if (typeof window === 'undefined') return [{ role: 'assistant', content: GREETING }];
+  try {
+    const stored = localStorage.getItem(CHAT_HISTORY_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    // Ignore malformed storage, fall back to the greeting.
+  }
+  return [{ role: 'assistant', content: GREETING }];
+}
+
 export default function ConversationalIntake({ onComplete, compact = false }: ConversationalIntakeProps) {
-  const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: GREETING }]);
+  const [messages, setMessages] = useState<Message[]>(loadStoredMessages);
   const [userSituation, setUserSituation] = useState<Partial<UserSituation>>({});
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -112,29 +127,7 @@ export default function ConversationalIntake({ onComplete, compact = false }: Co
   const chatSessionRef = useRef<ChatSession | null>(null);
 
   useEffect(() => {
-    const loadChatHistory = async () => {
-      const res = await fetch('/api/chat-history');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.messages && data.messages.length > 0) {
-          setMessages(data.messages);
-        }
-      }
-    };
-
-    loadChatHistory();
-  }, []);
-
-  useEffect(() => {
-    const saveChatHistory = async () => {
-      await fetch('/api/chat-history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
-      });
-    };
-
-    saveChatHistory();
+    localStorage.setItem(CHAT_HISTORY_STORAGE_KEY, JSON.stringify(messages));
   }, [messages]);
 
   const gatheredCount = REQUIRED_FIELDS.filter(
@@ -192,7 +185,7 @@ export default function ConversationalIntake({ onComplete, compact = false }: Co
     setErrorCount(0);
     setUseManualFallback(false);
     chatSessionRef.current = null;
-    fetch('/api/chat-history', { method: 'DELETE' });
+    localStorage.removeItem(CHAT_HISTORY_STORAGE_KEY);
   };
 
   const handleShowResults = () => {
