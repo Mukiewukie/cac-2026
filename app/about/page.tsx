@@ -30,7 +30,7 @@ const contributors = [
   },
   {
     name: "Ansh Nayak",
-    bio: "Ansh contributed ideas and testing that helped turn a complicated recovery process into simpler, more approachable steps.",
+    bio: "Ansh built the majority of the database of programs and charitable organizations, and optimized the website integration across features.",
   },
   {
     name: "Hannah Kim",

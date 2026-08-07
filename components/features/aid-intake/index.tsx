@@ -96,14 +96,31 @@ function getInsuranceRecoveryFields(): (keyof UserSituation)[] {
 
 export default function AidIntakeForm({ onSubmit, initialData, onCancel, submitLabel }: AidIntakeFormProps) {
   const [formData, setFormData] = useState<Partial<UserSituation>>(initialData ?? {});
-  const [openSection, setOpenSection] = useState<SectionId | null>('location');
+  // Auto-expand any section that already has answers (i.e. we're editing a
+  // previously-submitted situation) so those old answers are visible right
+  // away, instead of hidden behind a collapsed accordion. A brand-new,
+  // empty form falls back to just opening the first section.
+  const [openSections, setOpenSections] = useState<Set<SectionId>>(() => {
+    const withAnswers = new Set(
+      SECTIONS.filter(section => areFieldsAnswered(initialData ?? {}, section.getFields(initialData ?? {}))).map(section => section.id)
+    );
+    return withAnswers.size > 0 ? withAnswers : new Set<SectionId>(['location']);
+  });
 
   const setField = <K extends keyof UserSituation>(field: K, value: UserSituation[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const toggleSection = (id: SectionId) => {
-    setOpenSection(prev => (prev === id ? null : id));
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const answeredCount = (section: SectionMeta) => {
@@ -152,7 +169,7 @@ export default function AidIntakeForm({ onSubmit, initialData, onCancel, submitL
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {SECTIONS.map(section => {
-          const isOpen = openSection === section.id;
+          const isOpen = openSections.has(section.id);
           const { answered, total } = answeredCount(section);
 
           return (
