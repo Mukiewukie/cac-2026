@@ -8,13 +8,9 @@ import { useAuth } from '@/lib/firebase/use-auth';
 import { CompassMark } from '@/components/compass-mark';
 
 const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Chat with Us', href: '/conversational' },
-  { name: 'My Aid Programs', href: '/dashboard' },
-  { name: 'Deadline Tracker', href: '/deadlines' },
-  { name: 'FEMA Letter Help', href: '/fema' },
-  { name: 'Settings', href: '/settings' },
-  { name: 'About', href: '/about' },
+  { name: 'Find aid', href: '/conversational' },
+  { name: 'My aid', href: '/dashboard' },
+  { name: 'Deadlines', href: '/deadlines' },
 ];
 
 export default function Navigation() {
@@ -31,7 +27,7 @@ export default function Navigation() {
     <header className="sticky top-0 z-20 border-b border-[#e4d9cf] bg-[#f2ece5]/85 shadow-[0_4px_20px_rgba(61,43,32,0.04)] backdrop-blur-sm">
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-[22px] py-2"
+        className="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-[22px] py-3"
       >
         <Link
           href="/"
@@ -43,21 +39,21 @@ export default function Navigation() {
           >
             <CompassMark needleColor="#3d2b20" />
           </span>
-          <span className="text-[1.06rem] font-bold tracking-[-0.01em]">
+          <span className="text-[1.2rem] font-bold tracking-[-0.01em]">
             Aid Compass
           </span>
         </Link>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-0.5">
+          <div className="hidden items-center gap-0.5 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`group relative flex items-center whitespace-nowrap text-[0.83rem] font-medium no-underline transition-all ${
                   pathname === item.href
-                    ? 'rounded-full bg-[#eadbce] px-2.5 py-1.5 text-[#895031] shadow-sm'
-                    : 'text-[#6b5a4e] hover:text-[#2a201a] hover:bg-[#f7efe8] rounded-full px-2.5 py-1.5'
+                  ? 'rounded-full bg-[#eadbce] px-3 py-2 text-[1rem] text-[#895031] shadow-sm'
+                    : 'rounded-full px-3 py-2 text-[1rem] text-[#6b5a4e] hover:bg-[#f7efe8] hover:text-[#2a201a]'
                 }`}
               >
                 {item.name}
@@ -73,14 +69,14 @@ export default function Navigation() {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex-none rounded-lg border border-[#e4d9cf] bg-white px-3.5 py-1.5 text-sm font-semibold text-[#2a201a] no-underline transition-colors hover:bg-[#f2ece5]"
+                className="flex-none rounded-lg border border-[#e4d9cf] bg-white px-4 py-2 text-[1rem] font-semibold text-[#2a201a] no-underline transition-colors hover:bg-[#f2ece5]"
               >
                 Sign out
               </button>
             ) : (
               <Link
                 href="/sign-in"
-                className="flex-none rounded-lg bg-[#3d2b20] px-3.5 py-1.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-[#2b1e15]"
+                className="flex-none rounded-lg bg-[#3d2b20] px-4 py-2 text-[1rem] font-semibold text-white no-underline transition-colors hover:bg-[#2b1e15]"
               >
                 Sign in
               </Link>
