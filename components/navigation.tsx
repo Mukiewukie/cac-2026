@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { getFirebaseAuth } from '@/lib/firebase/client';
 import { clearServerSession } from '@/lib/firebase/session-client';
 import { useAuth } from '@/lib/firebase/use-auth';
@@ -17,6 +18,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   async function handleSignOut() {
     await Promise.all([getFirebaseAuth().signOut(), clearServerSession()]);
@@ -25,10 +27,7 @@ export default function Navigation() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-[#e4d9cf] bg-[#f2ece5]/85 shadow-[0_4px_20px_rgba(61,43,32,0.04)] backdrop-blur-sm">
-      <nav
-        aria-label="Primary"
-        className="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-[22px] py-3"
-      >
+      <nav aria-label="Primary" className="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-[22px] py-3">
         <Link
           href="/"
           className="flex items-center gap-2.5 text-[#2a201a] no-underline"
@@ -81,8 +80,33 @@ export default function Navigation() {
                 Sign in
               </Link>
             ))}
+          <button
+            type="button"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="rounded-lg border border-[#e4d9cf] bg-white px-3 py-2 text-[1rem] font-semibold text-[#2a201a] md:hidden"
+          >
+            Menu
+          </button>
         </div>
       </nav>
+      {isMenuOpen && (
+        <div id="mobile-navigation" className="border-t border-[#e4d9cf] bg-[#faf6f1] px-[22px] py-3 md:hidden">
+          <div className="mx-auto flex max-w-[1080px] flex-col gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMenuOpen(false)}
+                className={`rounded-lg px-4 py-3 text-[1.05rem] font-semibold no-underline ${pathname === item.href ? 'bg-[#eadbce] text-[#895031]' : 'text-[#2a201a] hover:bg-[#f2ece5]'}`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

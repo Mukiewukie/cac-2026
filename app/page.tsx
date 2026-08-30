@@ -17,15 +17,15 @@ const CONTOUR_PATHS = [
 const steps = [
   {
     title: "Tell us what you need",
-    body: "Answer a few simple questions. You do not need documents to begin.",
+    body: "Answer a few simple questions about your household. No documents needed to start.",
   },
   {
-    title: "See your options",
-    body: "Find aid programs that fit your situation and their deadlines.",
+    title: "Explore your options",
+    body: "See programs that may fit your situation, along with key deadlines.",
   },
   {
     title: "Take the next step",
-    body: "Use the official application link when you are ready.",
+    body: "Use the official application link when you’re ready to apply.",
   },
 ];
 
@@ -70,24 +70,36 @@ export default function Home() {
                 id="hero-h"
                 className="ac-reveal mb-6 font-serif text-[clamp(2.85rem,7vw,4.5rem)] font-medium leading-[1.03] tracking-[-0.025em] text-[#1f1610]"
               >
-                Find help after Hurricane Helene.
+                Find aid and next steps after Hurricane Helene.
               </h1>
               <p className="ac-reveal-2 mb-9 max-w-[620px] text-[clamp(1.25rem,3vw,1.5rem)] leading-relaxed text-[#55483d]">
-                We help you find disaster aid programs, deadlines, and the
-                official place to apply.
+                Answer a few simple questions to explore support programs,
+                deadlines, and official application links.
               </p>
               <div className="ac-reveal-3 flex flex-wrap items-center gap-x-5 gap-y-4">
                 <a
-                  href="/sign-up"
+                  href="/conversational"
                   className="ac-sheen rounded-[10px] px-7 py-4 text-[1.2rem] font-bold text-white no-underline bg-[#b0673f] shadow-[0_10px_24px_rgba(176,103,63,0.3)] transition-all hover:-translate-y-0.5 hover:bg-[#895031] hover:shadow-[0_14px_28px_rgba(176,103,63,0.4)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#b0673f]"
                 >
-                  Find my help
+                  See support for me
                 </a>
                 <span className="text-[1rem] text-[#6b5a4e]">
                   Free to use · Not a government site
                 </span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section aria-label="Urgent help" className="border-y border-[#e4d9cf] bg-[#faf6f1]">
+          <div className="mx-auto flex max-w-[1080px] flex-col gap-3 px-[22px] py-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-[1.2rem] font-bold text-[#1f1610]">Need help right away?</h2>
+              <p className="text-[1rem] text-[#55483d]">For housing, food, utilities, and local services, call NC 211. For an immediate emergency, call 911.</p>
+            </div>
+            <a href="tel:211" className="flex-none rounded-lg bg-[#3d2b20] px-5 py-3 text-center text-[1.05rem] font-bold text-white no-underline hover:bg-[#2b1e15]">
+              Call 211
+            </a>
           </div>
         </section>
 
@@ -104,7 +116,7 @@ export default function Home() {
             id="how-h"
             className="mb-10 max-w-[700px] font-serif text-[clamp(2.1rem,5vw,3rem)] font-medium leading-[1.1] tracking-[-0.01em] text-[#1f1610]"
           >
-            Start when you&apos;re ready.
+            Three simple steps to get started.
           </h2>
           <ol className="m-0 flex list-none flex-wrap gap-6 p-0">
             {steps.map((step, i) => (
@@ -144,8 +156,8 @@ export default function Home() {
               </span>
             </div>
             <p className="m-0 text-[0.92rem] text-[#a8917f]">
-              Free help finding and applying for disaster aid in western
-              North Carolina.
+              A free tool for finding Hurricane Helene recovery support in
+              western North Carolina.
             </p>
           </div>
           <div className="flex flex-wrap gap-12">

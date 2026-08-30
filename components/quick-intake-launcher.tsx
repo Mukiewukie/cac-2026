@@ -70,17 +70,17 @@ export default function QuickIntakeLauncher() {
         Need help?
       </p>
       <h2 className="pr-5 font-serif text-[1.6rem] font-medium leading-tight text-[#1f1610]">
-        Start with a few questions.
+        Find aid in a few steps.
       </h2>
       <p className="mt-3 text-[1.05rem] leading-relaxed text-[#6b5a4e]">
-        We&apos;ll help you find programs that may fit your situation.
+        Answer a few questions to explore programs that may fit your situation.
       </p>
       <button
         type="button"
         onClick={() => setIsChatOpen(true)}
         className="ac-sheen mt-5 inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-[1.05rem] font-bold text-white bg-[#b0673f] no-underline transition-transform hover:-translate-y-0.5 hover:bg-[#895031] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b0673f]"
       >
-        Find aid now →
+        Start here →
       </button>
     </aside>
   );
